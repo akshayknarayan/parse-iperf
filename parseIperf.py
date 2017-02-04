@@ -19,8 +19,9 @@ def parseBw(s):
     elif sp[1] == 'G':
         return b * 1e9
 
-def read():
-    with open(sys.argv[1], 'r') as f:
+
+def read(fn):
+    with open(fn, 'r') as f:
         for line in f:
             m = ipLine.match(line)
             if m is None:
@@ -29,10 +30,25 @@ def read():
             assert len(grp) == 4
             yield float(grp[0]), float(grp[1]), float(grp[2]), parseBw(grp[3])
 
-ls = [l for l in sorted(read(), key=lambda g:g[1]) if l[2] - l[1] < 3]
-t = {}
-for k, g in itertools.groupby(ls, lambda g:g[1]):
-    t[k] = sum(i[-1] for i in g)
 
-for k in sorted(t.keys()):
-    print k, t[k]
+def report(fn):
+    ls = [l for l in sorted(read(fn), key=lambda g:g[1]) if l[2] - l[1] < 3]
+    t = {}
+    for k, g in itertools.groupby(ls, lambda g:g[1]):
+        t[k] = sum(i[-1] for i in g)
+
+    return t
+
+
+def printReport(rep):
+    tot = 0
+    for k in sorted(rep.keys()):
+        print k, rep[k]
+        tot += rep[k]
+
+    print 'tot', tot/len(rep)
+
+
+if __name__ == '__main__':
+    rep = report(sys.argv[1])
+    printReport(rep)
